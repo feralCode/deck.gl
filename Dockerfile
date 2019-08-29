@@ -12,9 +12,7 @@ WORKDIR ${HOME}/bindings/python/pydeck
 
 RUN pip install -r requirements.txt \
     && pip install -r requirements-dev.txt \
-    && pip install -e .
-RUN jupyter nbextension install --py --symlink --sys-prefix pydeck \
-    && jupyter nbextension enable --py --sys-prefix pydeck
+    && pip install -e . --install-option "--build_all"
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
