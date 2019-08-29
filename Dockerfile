@@ -10,6 +10,13 @@ RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources
 RUN apt-get update
 RUN apt-get -y install yarn
 
+RUN apt-get install -y g++-6 && \
+    apt-get install -y mesa-utils && \
+    apt-get install -y xvfb && \
+    apt-get install -y libgl1-mesa-dri && \
+    apt-get install -y libglapi-mesa && \
+    apt-get install -y libosmesa6 && \
+    apt-get install -y libxi-dev
 
 ENV HOME=/tmp
 COPY . ${HOME}

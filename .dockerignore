@@ -1,20 +1,24 @@
-node_modules/*
-**/node_modules/*
-**/env/*
-**/env3/*
-**/build/*
-**/dist/*
-docs/*
-
+node_modules
+env
+env3
+build
+dist
+docs
 
 .git
 .ipynb_checkpoints
-notebooks
+__pycache__
+examples
 unused
 Dockerfile
 .DS_Store
 .gitignore
 
-# To prevent storing dev/temporary container data
 *.csv
 tmp
+test
+showcases
+scripts
+*.png
+dev-docs
+coverage
