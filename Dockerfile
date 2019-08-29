@@ -1,15 +1,32 @@
-FROM node:8.9.0
-
-WORKDIR /deck-gl
-ENV PATH /deck-gl/node_modules/.bin:$PATH
-
-# Install XVFB dependencies into container
-ENV DISPLAY :99
-ADD .buildkite/xvfb /etc/init.d/xvfb
+FROM python:3.7-slim
+RUN pip install --no-cache-dir notebook==5.*
 
 RUN apt-get update
-RUN apt-get -y install xvfb && chmod a+x /etc/init.d/xvfb
+RUN apt-get -y install curl gnupg
+RUN curl -sL https://deb.nodesource.com/setup_11.x  | bash -
+RUN apt-get -y install nodejs
 
-COPY package.json yarn.lock /deck-gl/
+ENV HOME=/tmp
+COPY . ${HOME}
+WORKDIR ${HOME}/bindings/python/pydeck
 
-RUN yarn
+RUN pip install -r requirements.txt \
+    && pip install -r requirements-dev.txt \
+    && pip install -e .
+RUN jupyter nbextension install --py --symlink --sys-prefix pydeck \
+    && jupyter nbextension enable --py --sys-prefix pydeck
+
+ARG NB_USER=jovyan
+ARG NB_UID=1000
+ENV USER ${NB_USER}
+ENV NB_UID ${NB_UID}
+ENV HOME /home/${NB_USER}
+
+RUN adduser --disabled-password \
+    --gecos "Default user" \
+    --uid ${NB_UID} \
+    ${NB_USER}
+
+USER root
+RUN chown -R ${NB_UID} ${HOME}
+USER ${NB_USER}
