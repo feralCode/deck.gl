@@ -86,7 +86,7 @@ Along with other options as below,
 
 - Default `1.0`
 
-The opacity of the layer. The same as [layer](/docs/api-reference/layer.md).
+The opacity of the layer. The same as defined in [layer](/docs/api-reference/layer.md).
 
 ##### `pointSize` (Number, Optional)
 
@@ -98,7 +98,7 @@ This value is only applied when [tile format](https://github.com/AnalyticalGraph
 ##### `DracoLoader` (Object, Optional)
 ##### `DracoWorkerLoader` (Object, Optional)
 
-One of `DracoLoader` or `DracoWorkerLoader` is required if the tileset contains any draco compressed tiles. [`@loaders.gl/draco`](https://github.com/uber-web/loaders.gl/tree/master/modules/draco) provides the draco decoding modules.
+Either `DracoLoader` or `DracoWorkerLoader` is required if the tileset contains any draco compressed tiles. [`@loaders.gl/draco`](https://github.com/uber-web/loaders.gl/tree/master/modules/draco) provides the draco decoding modules.
 
 ```js
 import {DracoLoader, DracoWorkerLoader} from '@loaders.gl/draco';
@@ -182,4 +182,4 @@ Follow [CompositeLayer](/docs/layers/composite-layer.md#_subLayerProp) and examp
 
 ## Source
 
-[modules/tile-layers/src/tile-3d-layer](https://github.com/uber/deck.gl/tree/master/modules/tile-layers/src/tile-3d-layer)
+[modules/tile-layers/src/tile-3d-layer](https://github.com/uber/deck.gl/tree/master/modules/geo-layers/src/tile-3d-layer)
