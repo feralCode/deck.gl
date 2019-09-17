@@ -74,10 +74,6 @@ new deck.Tile3DLayer({});
 
 Inherits from all [Base Layer](/docs/api-reference/layer.md) and [CompositeLayer](/docs/api-reference/composite-layer.md) properties.
 
-Also based on [tile format](https://github.com/AnalyticalGraphicsInc/3d-tiles/tree/master/specification#introduction),
-- for Point Cloud (`pnts`) tiles, inherits from all [Point Cloud Layer](/docs/api-reference/point-cloud-layer.md) 
-- for Batched 3D Model (`b3dm`) and Instanced 3D Model (`i3dm`) tiles, inherits from all [ScenegraphLayer](/docs/api-reference/scenegraph-layer.md) properties.
-
 Along with other options as below,
 
 ### Render Options
@@ -95,15 +91,6 @@ The opacity of the layer. The same as defined in [layer](/docs/api-reference/lay
 Global radius of all points, in units specified by `sizeUnits` (default pixels).
 This value is only applied when [tile format](https://github.com/AnalyticalGraphicsInc/3d-tiles/tree/master/specification#introduction) is `pnts`.
 
-##### `DracoLoader` (Object, Optional)
-##### `DracoWorkerLoader` (Object, Optional)
-
-Either `DracoLoader` or `DracoWorkerLoader` is required if the tileset contains any draco compressed tiles. [`@loaders.gl/draco`](https://github.com/uber-web/loaders.gl/tree/master/modules/draco) provides the draco decoding modules.
-
-```js
-import {DracoLoader, DracoWorkerLoader} from '@loaders.gl/draco';
-```
-
 ### Data Properties
 
 ##### `data` (String, optional)
@@ -119,19 +106,28 @@ import {DracoLoader, DracoWorkerLoader} from '@loaders.gl/draco';
 
 [Set up Ion account](https://cesium.com/docs/tutorials/getting-started/#your-first-app);
 
-##### `_loadOptions` (Object, Optional)
+##### `loadOptions` (Object, Optional)
 
 - Default: `{throttleRequests: true}`
 
-Tile3DLayer constructs a [`Tileset3D`](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d) object after fetching tilset json file. `_loadOptions` is an experimental prop to provide Tileset options [Tileset3D options](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d#options). Among these options, `onTileLoad`, `onTileUnload` and `onTileLoadFail` should be passed as layer props.
+Tile3DLayer constructs a [`Tileset3D`](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d) object after fetching tilset json file. `loadOptions` is an experimental prop to provide Tileset options [Tileset3D options](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d#options). Among these options, `onTileLoad`, `onTileUnload` and `onTileLoadFail` should be passed as layer props.
 
 ```js
 const layer = new Tile3DLayer({
   data: '<path-to-your-tileset json file>',
-  _loadOptions: {
+  loadOptions: {
     throttleRequests: false
   }
 })
+```
+
+##### `DracoLoader` (Object, Optional)
+##### `DracoWorkerLoader` (Object, Optional)
+
+Either `DracoLoader` or `DracoWorkerLoader` is required if the tileset contains any draco compressed tiles. [`@loaders.gl/draco`](https://github.com/uber-web/loaders.gl/tree/master/modules/draco) provides the draco decoding modules.
+
+```js
+import {DracoLoader, DracoWorkerLoader} from '@loaders.gl/draco';
 ```
 
 ### Data Accessors
@@ -174,9 +170,9 @@ const layer = new Tile3DLayer({
 
 The Tile3DLayer renders the following sublayers based on tile [format](https://github.com/AnalyticalGraphicsInc/3d-tiles/tree/master/specification#introduction):
 
-* `scenegraph` - a [ScenegraphLayer](/docs/layers/scenegraph-layer.md) rendering all the tiles with Batched 3D Model format or Instanced 3D Model format.
+* `scenegraph` - a [ScenegraphLayer](/docs/layers/scenegraph-layer.md) rendering all the tiles with Batched 3D Model format (`b3dm`) or Instanced 3D Model format (`i3dm`).
   - `_lighting` is default to `pbr`.
-* `pointcloud` - a [PointCloudLayer](/docs/layers/point-cloud-layer.md) rendering all the tiles with Point Cloud format.
+* `pointcloud` - a [PointCloudLayer](/docs/layers/point-cloud-layer.md) rendering all the tiles with Point Cloud format (`pnts`).
 
 Follow [CompositeLayer](/docs/layers/composite-layer.md#_subLayerProp) and example in this layer doc to see how to override sub layer props.
 
