@@ -18,7 +18,6 @@ export default class App extends Component {
   render() {
     const layer = new Tile3DLayer({
       id: 'tile-3d-layer',
-      pointSize: 2.0,
       data: ...,
       onTilesetLoad: (tileset) => {
         // Recenter to cover the tileset
@@ -111,7 +110,7 @@ The opacity of the layer. The same as [layer](/docs/api-reference/layer.md).
 
 - Default: `{throttleRequests: true}`
 
-Tile3DLayer constructs a [`Tileset3D`](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d) object after tilset json file. `loadOptions` is an experimental prop to provide Tileset options [Tileset3D options](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d#options). Among these options, `onTileLoad`, `onTileUnload` and `onTileLoadFail` should be passed as layer props.
+Tile3DLayer constructs a [`Tileset3D`](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d) object after fetching tilset json file. `loadOptions` is an experimental prop to provide Tileset options [Tileset3D options](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d#options). Among these options, `onTileLoad`, `onTileUnload` and `onTileLoadFail` should be passed as layer props.
 
 ```js
 const layer = new Tile3DLayer({
