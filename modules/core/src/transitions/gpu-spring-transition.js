@@ -1,6 +1,6 @@
 /* eslint-disable complexity, max-statements, max-params */
 import GL from '@luma.gl/constants';
-import {Buffer, Transform} from '@luma.gl/core';
+import {Buffer, Transform, Framebuffer, Texture2D, readPixelsToArray} from '@luma.gl/core';
 import {
   padBuffer,
   getAttributeTypeFromSize,
@@ -26,6 +26,8 @@ export default class GPUSpringTransition {
     // due to performance costs
     this.currentLength = 0;
     this.transform = null;
+    this.texture = getTexture(gl);
+    this.framebuffer = getFramebuffer(gl, this.texture);
     const usage = GL.DYNAMIC_COPY;
     const byteLength = 0;
     this.buffers = [
@@ -81,7 +83,7 @@ export default class GPUSpringTransition {
       this.transitionSettings.onInterrupt();
     }
 
-    this.transform = this.transform || new Transform(gl, getShaders(this.attribute.size));
+    this.transform = this.transform || getTransform(gl, this.attribute, this.framebuffer);
     this.transform.update({
       elementCount: Math.floor(this.currentLength / this.attribute.size),
       sourceBuffers: {
@@ -107,11 +109,19 @@ export default class GPUSpringTransition {
       }
     });
     this.transform.run({
+      framebuffer: this.framebuffer,
+      discard: false,
       uniforms: {
         stiffness: this.transitionSettings.stiffness,
-        damping: this.transitionSettings.damping
+        damping: this.transitionSettings.damping,
+        threshold: 0.01
+      },
+      parameters: {
+        depthTest: false,
+        blend: false
       }
     });
+    // console.log('after -', readPixelsToArray(this.framebuffer))
     this.buffers = cycleBuffers(this.buffers);
     this.attributeInTransition.update({buffer: this.buffers[1]});
 
@@ -128,18 +138,28 @@ export default class GPUSpringTransition {
     while (this.buffers.length) {
       this.buffers.pop().delete();
     }
+    this.texture.delete();
+    this.texture = null;
+    this.framebuffer.delete();
+    this.framebuffer = null;
   }
 }
 
-const vs = `
+function getTransform(gl, attribute, framebuffer) {
+  const attributeType = getAttributeTypeFromSize(attribute.size);
+  return new Transform(gl, {
+    framebuffer,
+    vs: `
 #define SHADER_NAME spring-transition-vertex-shader
 
+uniform float threshold;
 uniform float stiffness;
 uniform float damping;
 attribute ATTRIBUTE_TYPE aPrev;
 attribute ATTRIBUTE_TYPE aCur;
 attribute ATTRIBUTE_TYPE aTo;
 varying ATTRIBUTE_TYPE vNext;
+varying float vIsTransitioningFlag;
 
 ATTRIBUTE_TYPE getNextValue(ATTRIBUTE_TYPE cur, ATTRIBUTE_TYPE prev, ATTRIBUTE_TYPE dest) {
   ATTRIBUTE_TYPE velocity = cur - prev;
@@ -150,18 +170,51 @@ ATTRIBUTE_TYPE getNextValue(ATTRIBUTE_TYPE cur, ATTRIBUTE_TYPE prev, ATTRIBUTE_T
 }
 
 void main(void) {
-  vNext = getNextValue(aCur, aPrev, aTo);
-  gl_Position = vec4(0.0);
-}
-`;
+  bool isTransitioning = length(aCur - aPrev) > threshold || length(aTo - aCur) > threshold;
+  vIsTransitioningFlag = isTransitioning ? 1.0 : 0.0;
 
-function getShaders(attributeSize) {
-  const attributeType = getAttributeTypeFromSize(attributeSize);
-  return {
-    vs,
+  vNext = getNextValue(aCur, aPrev, aTo);
+  gl_Position = vec4(0, 0, 0, 1);
+}
+`,
+    fs: `
+#define SHADER_NAME spring-transition-is-transitioning-fragment-shader
+
+varying float vIsTransitioningFlag;
+
+void main(void) {
+  // if (vIsTransitioningFlag == 0.0) {
+  //   discard;
+  // }
+  gl_FragColor = vec4(1.0);
+}`,
     defines: {
       ATTRIBUTE_TYPE: attributeType
     },
     varyings: ['vNext']
-  };
+  });
+}
+
+function getTexture(gl) {
+  return new Texture2D(gl, {
+    data: new Uint8Array(4),
+    format: GL.RGBA,
+    type: GL.UNSIGNED_BYTE,
+    border: 0,
+    mipmaps: false,
+    dataFormat: GL.RGBA,
+    width: 1,
+    height: 1,
+  });
+}
+
+function getFramebuffer(gl, texture) {
+  return new Framebuffer(gl, {
+    id: 'spring-transition-is-transitioning-framebuffer',
+    width: 1,
+    height: 1,
+    attachments: {
+      [GL.COLOR_ATTACHMENT0]: texture
+    }
+  });
 }
