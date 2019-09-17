@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 import {experimental} from '@deck.gl/core';
+
 const {count} = experimental;
 
 function noop() {}
@@ -99,6 +100,7 @@ export function generateLayerTests({
       // Default assert
       if (runDefaultAsserts) {
         if (params.layer.isComposite) {
+          // eslint-disable-next-line
           if (count(params.layer.props.data)) {
             assert(params.subLayers.length, 'Layer should have sublayers');
           }

@@ -18,7 +18,8 @@ export default class App extends Component {
   render() {
     const layer = new Tile3DLayer({
       id: 'tile-3d-layer',
-      tilesetUrl: '<path-to-your-tileset json file>',
+      pointSize: 2.0,
+      data: ...,
       onTilesetLoad: (tileset) => {
         // Recenter to cover the tileset
         const {cartographicCenter, zoom} = tileset;
@@ -30,6 +31,10 @@ export default class App extends Component {
              zoom
            }
         });
+      },
+      // override pointcloud subLayer prop
+      _subLayerProps: {
+        pointcloud: {pointSize: 3.0}
       }
     });
      
@@ -70,15 +75,30 @@ new deck.Tile3DLayer({});
 
 Inherits from all [Base Layer](/docs/api-reference/layer.md) and [CompositeLayer](/docs/api-reference/composite-layer.md) properties.
 
-Also based on tile format,
+Also based on [tile format](https://github.com/AnalyticalGraphicsInc/3d-tiles/tree/master/specification#introduction),
 - for Point Cloud (`pnts`) tiles, inherits from all [Point Cloud Layer](/docs/api-reference/point-cloud-layer.md) 
 - for Batched 3D Model (`b3dm`) and Instanced 3D Model (`i3dm`) tiles, inherits from all [ScenegraphLayer](/docs/api-reference/scenegraph-layer.md) properties.
 
 Along with other options as below,
 
-##### `tilesetUrl` (String, Optional)
+##### `getPointColor` (getPointColor, Optional)
 
-- url to fetch tiles entry point [Tileset JSON](https://github.com/AnalyticalGraphicsInc/3d-tiles/tree/master/specification#tileset-json) file.
+- Default `[0, 0, 0, 255]`
+  
+  The rgba color at the target, in `r, g, b, [a]`. Each component is in the 0-255 range.
+  This value is only applied when [tile format](https://github.com/AnalyticalGraphicsInc/3d-tiles/tree/master/specification#introduction) is `pnts` and no [color properties](https://github.com/AnalyticalGraphicsInc/3d-tiles/blob/master/specification/TileFormats/PointCloud/README.md#point-colors) are defined in point cloud tile file. 
+
+##### `opacity` (Number, Optional)
+
+- Default `1.0`
+
+The opacity of the layer. The same as [layer](/docs/api-reference/layer.md).
+
+##### `data` (String, optional)
+
+* Default: null
+
+- A URL to fetch tiles entry point [Tileset JSON](https://github.com/AnalyticalGraphicsInc/3d-tiles/tree/master/specification#tileset-json) file or json object of tileset.
 
 ##### `_ionAssetId` (Number|String, Optional)
 ##### `_ionAccessToken` (String, Optional)
@@ -86,6 +106,21 @@ Along with other options as below,
 - `_ionAssetId` and `_ionAccessToken` are used to fetch ion dataset. They are experimental properties, may change in next releases. 
 
 [Set up Ion account](https://cesium.com/docs/tutorials/getting-started/#your-first-app);
+
+##### `_loadOptions` (Object, Optional)
+
+- Default: `{throttleRequests: true}`
+
+Tile3DLayer constructs a [`Tileset3D`](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d) object after tilset json file. `loadOptions` is an experimental prop to provide Tileset options [Tileset3D options](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d#options). Among these options, `onTileLoad`, `onTileUnload` and `onTileLoadFail` should be passed as layer props.
+
+```js
+const layer = new Tile3DLayer({
+  data: ...,
+  _loadOptions: {
+    throttleRequests: false
+  }
+})
+```
 
 ##### `DracoLoader` (Object, Optional)
 ##### `DracoWorkerLoader` (Object, Optional)
@@ -131,7 +166,8 @@ The Tile3DLayer renders the following sublayers based on tile [format](https://g
   - `_lighting` is default to `pbr`.
 * `pointcloud` - a [PointCloudLayer](/docs/layers/point-cloud-layer.md) rendering all the tiles with Point Cloud format.
   - `pointSize` is default to `1.0`.
-  - `getColor` is default to `[255, 0, 0]`
+
+Follow [CompositeLayer](/docs/layers/composite-layer.md#_subLayerProp) and example in this layer doc to see how to override sub layer props.
 
 ## Source
 
