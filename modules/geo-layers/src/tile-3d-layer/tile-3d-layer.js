@@ -23,7 +23,7 @@ const defaultProps = {
   onTilesetLoad: tileset3d => {},
   onTileLoad: tileHeader => {},
   onTileUnload: tileHeader => {},
-  onTileLoadFail: (tile, message, url) => {},
+  onTileLoadFail: (tile, message, url) => {}
 };
 
 function unpackTile(tileHeader, dracoLoader) {

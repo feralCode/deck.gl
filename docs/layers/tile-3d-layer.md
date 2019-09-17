@@ -18,7 +18,7 @@ export default class App extends Component {
   render() {
     const layer = new Tile3DLayer({
       id: 'tile-3d-layer',
-      data: ...,
+      data: '<path-to-your-tileset json file>',
       onTilesetLoad: (tileset) => {
         // Recenter to cover the tileset
         const {cartographicCenter, zoom} = tileset;
