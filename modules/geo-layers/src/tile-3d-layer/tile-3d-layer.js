@@ -12,16 +12,18 @@ import {getFrameState} from './get-frame-state';
 
 const defaultProps = {
   getPointColor: [255, 0, 0],
+  pointSize: 1.0,
   opacity: 1.0,
 
   data: null,
   _ionAssetId: null,
   _ionAccessToken: null,
+  _loadOptions: {throttleRequests: true},
+
   onTilesetLoad: tileset3d => {},
   onTileLoad: tileHeader => {},
   onTileUnload: tileHeader => {},
   onTileLoadFail: (tile, message, url) => {},
-  _loadOptions: {throttleRequests: true}
 };
 
 function unpackTile(tileHeader, dracoLoader) {
@@ -117,6 +119,10 @@ export default class Tile3DLayer extends CompositeLayer {
     const ionMetadata = await _getIonTilesetMetadata(ionAccessToken, ionAssetId);
     const {url, headers} = ionMetadata;
     return await this._loadTileset(url, {headers}, ionMetadata);
+  }
+
+  getLoadOptions() {
+    return this.props._loadOptions;
   }
 
   _updateTileset(tileset3d) {
@@ -245,9 +251,6 @@ export default class Tile3DLayer extends CompositeLayer {
     const SubLayerClass = this.getSubLayerClass('pointcloud', PointCloudLayer);
 
     return new SubLayerClass(
-      {
-        pointSize: 1.0
-      },
       this.getSubLayerProps({
         id: 'pointcloud'
       }),

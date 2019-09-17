@@ -31,9 +31,9 @@ export default class App extends Component {
            }
         });
       },
-      // override pointcloud subLayer prop
+      // override scenegraph subLayer prop
       _subLayerProps: {
-        pointcloud: {pointSize: 3.0}
+        scenegraph: {_lighting: 'flat'}
       }
     });
      
@@ -80,18 +80,31 @@ Also based on [tile format](https://github.com/AnalyticalGraphicsInc/3d-tiles/tr
 
 Along with other options as below,
 
-##### `getPointColor` (getPointColor, Optional)
-
-- Default `[0, 0, 0, 255]`
-  
-  The rgba color at the target, in `r, g, b, [a]`. Each component is in the 0-255 range.
-  This value is only applied when [tile format](https://github.com/AnalyticalGraphicsInc/3d-tiles/tree/master/specification#introduction) is `pnts` and no [color properties](https://github.com/AnalyticalGraphicsInc/3d-tiles/blob/master/specification/TileFormats/PointCloud/README.md#point-colors) are defined in point cloud tile file. 
+### Render Options
 
 ##### `opacity` (Number, Optional)
 
 - Default `1.0`
 
 The opacity of the layer. The same as [layer](/docs/api-reference/layer.md).
+
+##### `pointSize` (Number, Optional)
+
+- Default `1.0`
+
+Global radius of all points, in units specified by `sizeUnits` (default pixels).
+This value is only applied when [tile format](https://github.com/AnalyticalGraphicsInc/3d-tiles/tree/master/specification#introduction) is `pnts`.
+
+##### `DracoLoader` (Object, Optional)
+##### `DracoWorkerLoader` (Object, Optional)
+
+One of `DracoLoader` or `DracoWorkerLoader` is required if the tileset contains any draco compressed tiles. [`@loaders.gl/draco`](https://github.com/uber-web/loaders.gl/tree/master/modules/draco) provides the draco decoding modules.
+
+```js
+import {DracoLoader, DracoWorkerLoader} from '@loaders.gl/draco';
+```
+
+### Data Properties
 
 ##### `data` (String, optional)
 
@@ -110,25 +123,25 @@ The opacity of the layer. The same as [layer](/docs/api-reference/layer.md).
 
 - Default: `{throttleRequests: true}`
 
-Tile3DLayer constructs a [`Tileset3D`](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d) object after fetching tilset json file. `loadOptions` is an experimental prop to provide Tileset options [Tileset3D options](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d#options). Among these options, `onTileLoad`, `onTileUnload` and `onTileLoadFail` should be passed as layer props.
+Tile3DLayer constructs a [`Tileset3D`](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d) object after fetching tilset json file. `_loadOptions` is an experimental prop to provide Tileset options [Tileset3D options](https://loaders.gl/modules/3d-tiles/docs/api-reference/tileset-3d#options). Among these options, `onTileLoad`, `onTileUnload` and `onTileLoadFail` should be passed as layer props.
 
 ```js
 const layer = new Tile3DLayer({
-  data: ...,
+  data: '<path-to-your-tileset json file>',
   _loadOptions: {
     throttleRequests: false
   }
 })
 ```
 
-##### `DracoLoader` (Object, Optional)
-##### `DracoWorkerLoader` (Object, Optional)
+### Data Accessors
 
-One of `DracoLoader` or `DracoWorkerLoader` is required if the tileset contains any draco compressed tiles. [`@loaders.gl/draco`](https://github.com/uber-web/loaders.gl/tree/master/modules/draco) provides the draco decoding modules.
+##### `getPointColor` (Function|Array, Optional)
 
-```js
-import {DracoLoader, DracoWorkerLoader} from '@loaders.gl/draco';
-```
+- Default `[0, 0, 0, 255]`
+  
+  The rgba color at the target, in `r, g, b, [a]`. Each component is in the 0-255 range.
+  This value is only applied when [tile format](https://github.com/AnalyticalGraphicsInc/3d-tiles/tree/master/specification#introduction) is `pnts` and no [color properties](https://github.com/AnalyticalGraphicsInc/3d-tiles/blob/master/specification/TileFormats/PointCloud/README.md#point-colors) are defined in point cloud tile file. 
 
 ### Callbacks 
 
@@ -164,7 +177,6 @@ The Tile3DLayer renders the following sublayers based on tile [format](https://g
 * `scenegraph` - a [ScenegraphLayer](/docs/layers/scenegraph-layer.md) rendering all the tiles with Batched 3D Model format or Instanced 3D Model format.
   - `_lighting` is default to `pbr`.
 * `pointcloud` - a [PointCloudLayer](/docs/layers/point-cloud-layer.md) rendering all the tiles with Point Cloud format.
-  - `pointSize` is default to `1.0`.
 
 Follow [CompositeLayer](/docs/layers/composite-layer.md#_subLayerProp) and example in this layer doc to see how to override sub layer props.
 
